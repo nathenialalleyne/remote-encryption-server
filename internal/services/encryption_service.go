@@ -1,19 +1,44 @@
-package services
+package main
 
 import (
-	"os/exec"
-
-	"github.com/nathenialalleyne/remote-encryption-service/pkg/helpers"
+	"crypto/aes"
+	"crypto/cipher"
+	"crypto/rand"
+	"encoding/base64"
+	"fmt"
+	"io"
 )
 
-func EncryptionService() []byte {
-	cmd := exec.Command("go", "run", "../services/encryption_service.go")
+func main() {
 
-	output, err := cmd.Output()
+}
 
+func encrypt(plaintext string, key string) (string, error) {
+	block, err := aes.NewCipher([]byte(key))
 	if err != nil{
-		helpers.HandleError(err)
+		return "", err
 	}
 
-	return output
+	cipherText :=make([]byte, aes.BlockSize+len(plaintext))
+	iv := cipherText[:aes.BlockSize]
+
+	if _, err := io.ReadFull(rand.Reader, iv); err != nil {
+		return "", err
+	}
+
+	stream := cipher.NewCFBEncrypter(block, iv)
+	stream.XORKeyStream(cipherText[aes.BlockSize:], []byte(plaintext))
+
+	return base64.URLEncoding.EncodeToString(cipherText), nil
+}
+
+func generateAESKey(length int) ([]byte, error){
+	key := make([]byte, length)
+
+	_, err := io.ReadFull(rand.Reader, key)
+	if err != nil{
+		return nil, fmt.Errorf("Failed to generate key: %v", err)
+	}
+
+	return key, nil
 }

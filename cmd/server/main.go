@@ -21,7 +21,7 @@ import (
 
 var ctx = context.Background()
 
-//TODO: Close Redis client when program closes
+//TODO: Close and destroy redis instance when program closes/crashes
 //TODO: API for creating processes
 
 func main() {
