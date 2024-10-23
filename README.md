@@ -1,4 +1,4 @@
-# remote-encryption-service
+# remote-encryption-server
 
 ### Overview
 
